@@ -1,7 +1,7 @@
 {
     "id": "day-planner-og",
     "name": "Day Planner OG",
-    "version": "1.1.0",
+    "version": "1.1.1",
     "minAppVersion": "1.13.0",
     "description": "Plan your day and setup pomodoro timers; fork of original by James Lynch (which stopped at 0.5.8) to preserve simple planner behavior. FEI352 fork: supports HH:mm + TODO/DOING/DONE status word format (e.g. `- [ ] 15:35 TODO 散步`).",
     "isDesktopOnly": false,

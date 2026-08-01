@@ -76,10 +76,6 @@ function itemClasses(item: PlanItem) {
 
 function itemText(item: PlanItem): string {
     let text = item.text ?? "";
-    // 2026-08-01 FEI352 fork: 剥离前导状态词（TODO/DOING/DONE）——状态已由 checkbox 表达，
-    // 时间线只显示任务名。同时剥离 <sup>/<sub> 统计标签（sub/sup 时长标记不显示）。
-    text = text.replace(/^\s*(?:TODO|DOING|DONE)\s+/i, "");
-    text = text.replace(/<sup>[^<]*<\/sup>/gi, "").replace(/<sub>[^<]*<\/sub>/gi, "");
     // Convert Markdown links to HTML
     text = text.replace(MARKDOWN_LINK_REGEX, (_match, p1, _p2) => {
             return p1;

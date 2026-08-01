@@ -81,7 +81,11 @@ export default class Parser {
             if (match) {
                 // console.log(match);
                 const value = match;
-                const text = value.groups.text;
+                // 2026-08-01 FEI352 fork: 状态词（TODO/DOING/DONE）在时间前时，
+                // 保留回 text——状态词是任务行内容的一部分，不丢弃（与上游一致：
+                // checkbox 后的文本原样保留，状态由 checkbox 驱动）。
+                const text =
+                    (value.groups.statusWord || "") + (value.groups.text || "");
                 // console.log(text);
                 const isBreak = this.matches(text, this.PLAN_BREAK);
                 const isEnd = this.matches(text, this.PLAN_END);
