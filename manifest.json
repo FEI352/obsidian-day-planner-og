@@ -1,11 +1,11 @@
 {
-  "id": "day-planner-og",
-  "name": "Day Planner OG",
-  "version": "1.0.7",
-  "minAppVersion": "1.13.0",
-  "description": "Plan your day and setup pomodoro timers; fork of original by James Lynch (which stopped at 0.5.8) to preserve simple planner behavior.",
-  "isDesktopOnly": false,
-  "author": "James Lynch, continued by Erin Schnabel",
-  "authorUrl": "https://github.com/ebullient",
-  "fundingUrl": "https://buymeacoffee.com/ebullient"
+    "id": "day-planner-og",
+    "name": "Day Planner OG",
+    "version": "1.1.0",
+    "minAppVersion": "1.13.0",
+    "description": "Plan your day and setup pomodoro timers; fork of original by James Lynch (which stopped at 0.5.8) to preserve simple planner behavior. FEI352 fork: supports HH:mm + TODO/DOING/DONE status word format (e.g. `- [ ] 15:35 TODO 散步`).",
+    "isDesktopOnly": false,
+    "author": "James Lynch, continued by Erin Schnabel; FEI352 fork by Jau Puihing",
+    "authorUrl": "https://github.com/FEI352/obsidian-day-planner-og",
+    "fundingUrl": "https://buymeacoffee.com/ebullient"
 }

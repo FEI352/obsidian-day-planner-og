@@ -18,8 +18,10 @@ export default class Parser {
         this.config = config;
         this.planItemFactory = new PlanItemFactory(this.config);
         // do not include break/end in the regex match. Keep it simple
+        // 2026-08-01 FEI352 fork: 支持可选状态词前缀（TODO/DOING/DONE），
+        // 兼容 `- [ ] 15:35 TODO 任务` 与 `- [ ] TODO 15:35 任务` 两种格式。
         this.PLAN_PARSER_REGEX =
-            /^(-?[\s]*\[?(?<completion>.)\]\s*?(?<hours>\d{1,2}):(?<minutes>\d{2})\s(?<text>.*?))$/i;
+            /^(-?[\s]*\[?(?<completion>.)\]\s*?(?<statusWord>TODO\s+|DOING\s+|DONE\s+)?(?<hours>\d{1,2}):(?<minutes>\d{2})\s(?<text>.*?))$/i;
         this.updateSettings();
     }
 
