@@ -3,7 +3,7 @@
     "name": "Day Planner OG",
     "version": "1.1.1",
     "minAppVersion": "1.13.0",
-    "description": "Plan your day and setup pomodoro timers; fork of original by James Lynch (which stopped at 0.5.8) to preserve simple planner behavior. FEI352 fork: supports HH:mm + TODO/DOING/DONE status word format (e.g. `- [ ] 15:35 TODO 散步`).",
+    "description": "Plan your day and setup pomodoro timers; fork of original by James Lynch (which stopped at 0.5.8) to preserve simple planner behavior. FEI352 fork: supports HH:mm + TODO/DOING/DONE status words, wikilinks, and block/note embed resolution.",
     "isDesktopOnly": false,
     "author": "James Lynch, continued by Erin Schnabel; FEI352 fork by Jau Puihing",
     "authorUrl": "https://github.com/FEI352/obsidian-day-planner-og",
