@@ -1,5 +1,6 @@
 import type { Workspace } from "obsidian";
 import type DayPlannerFile from "./file";
+import { renderTaskPlainTextFallback } from "./link-resolver";
 import Logger from "./logger";
 import type { PlanItem, PlanSummaryData } from "./plan-data";
 import type PlannerMarkdown from "./planner-md";
@@ -200,9 +201,14 @@ export default class StatusBar {
         const minsUntilNext = lastMinsUntil === "0" ? "1" : lastMinsUntil;
         const minsText = `${minsUntilNext} min${minsUntilNext === "1" ? "" : "s"}`;
 
+        const currentDisplay =
+            current.displayText ?? renderTaskPlainTextFallback(current.text);
+        const nextDisplay =
+            next.displayText ?? renderTaskPlainTextFallback(next.text);
+
         if (settings.nowAndNextInStatusBar) {
-            this.statusBarTextContent.textContent = ` ${current.rawTime} ${this.ellipsis(current.text, 10)}`;
-            this.nextTextContent.textContent = ` ${next.rawTime} ${this.ellipsis(next.text, 10)}`;
+            this.statusBarTextContent.textContent = ` ${current.rawTime} ${this.ellipsis(currentDisplay, 10)}`;
+            this.nextTextContent.textContent = ` ${next.rawTime} ${this.ellipsis(nextDisplay, 10)}`;
             this.show(this.statusBarText);
             this.show(this.nextText);
         } else {
@@ -210,9 +216,9 @@ export default class StatusBar {
             this.hide(this.nextText);
         }
         const currentTaskStatus = `Current Task (${percentageComplete.toFixed(0)}% complete)`;
-        const currentTaskTimeAndText = `${current.rawTime} ${current.text}`;
+        const currentTaskTimeAndText = `${current.rawTime} ${currentDisplay}`;
         const nextTask = `Next Task (in ${minsText})`;
-        const nextTaskTimeAndText = `${next.rawTime} ${next.text}`;
+        const nextTaskTimeAndText = `${next.rawTime} ${nextDisplay}`;
         this.cardCurrentLabel.textContent = currentTaskStatus;
         this.cardCurrentDetail.textContent = ` ${currentTaskTimeAndText}`;
         this.cardNextLabel.textContent = nextTask;

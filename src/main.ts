@@ -11,6 +11,7 @@ import {
 } from "obsidian";
 import { COLORS, DEFAULT_SETTINGS, VIEW_TYPE_TIMELINE } from "./constants";
 import DayPlannerFile from "./file";
+import { DayPlannerLinkResolver } from "./link-resolver";
 import Logger from "./logger";
 import Parser from "./parser";
 import { PlanSummaryData } from "./plan-data";
@@ -176,6 +177,13 @@ export default class DayPlanner extends Plugin implements ActiveConfig {
             });
         });
 
+        if (typeof this.registerHoverLinkSource === "function") {
+            this.registerHoverLinkSource(VIEW_TYPE_TIMELINE, {
+                display: "Day Planner Timeline",
+                defaultMod: false,
+            });
+        }
+
         this.addSettingTab(new DayPlannerSettingsTab(this.app, this));
 
         this.register(() => {
@@ -194,12 +202,14 @@ export default class DayPlanner extends Plugin implements ActiveConfig {
             : "Unknown";
 
         const progress = new Progress();
+        const linkResolver = new DayPlannerLinkResolver(this.app);
         this.plannerMD = new PlannerMarkdown(
             this.app.workspace,
             this,
             this.file,
             this.parser,
             progress,
+            linkResolver,
         );
 
         this.statusBar = new StatusBar(
@@ -207,13 +217,7 @@ export default class DayPlanner extends Plugin implements ActiveConfig {
             this.addStatusBarItem(),
             this.app.workspace,
             progress,
-            new PlannerMarkdown(
-                this.app.workspace,
-                this,
-                this.file,
-                this.parser,
-                progress,
-            ),
+            this.plannerMD,
             this.file,
         );
         this.statusBar.initStatusBar();

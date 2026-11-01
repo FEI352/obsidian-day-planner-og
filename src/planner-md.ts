@@ -1,6 +1,7 @@
 import { MarkdownView, type Workspace } from "obsidian";
 import { DAY_PLANNER_DEFAULT_CONTENT } from "./constants";
 import type DayPlannerFile from "./file";
+import type { DayPlannerLinkResolver } from "./link-resolver";
 import Logger from "./logger";
 import type Parser from "./parser";
 import { PlanSummaryData } from "./plan-data";
@@ -14,6 +15,7 @@ export default class PlannerMarkdown {
     file: DayPlannerFile;
     parser: Parser;
     progress: Progress;
+    linkResolver?: DayPlannerLinkResolver;
 
     constructor(
         workspace: Workspace,
@@ -21,12 +23,14 @@ export default class PlannerMarkdown {
         file: DayPlannerFile,
         parser: Parser,
         progress: Progress,
+        linkResolver?: DayPlannerLinkResolver,
     ) {
         this.workspace = workspace;
         this.config = config;
         this.file = file;
         this.parser = parser;
         this.progress = progress;
+        this.linkResolver = linkResolver;
     }
 
     async insertPlanner(filePath: string) {
@@ -53,9 +57,13 @@ export default class PlannerMarkdown {
             const now = new Date();
 
             // Read and update file contents
+            summary.sourcePath = filePath;
             await this.file.processFile(filePath, (content) =>
                 this.parser.parseContent(content, summary, now),
             );
+            if (this.linkResolver) {
+                await this.linkResolver.resolvePlanSummary(summary, filePath);
+            }
 
             return summary;
         } catch (error) {

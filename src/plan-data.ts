@@ -5,6 +5,7 @@ export class PlanSummaryData {
     iAmWriter: boolean;
     empty: boolean;
     invalid: boolean;
+    sourcePath = "";
     items: PlanItem[];
     past: PlanItem[];
     current: PlanItem;
@@ -76,6 +77,8 @@ export class PlanItem {
     durationMins: number;
     rawTime: string;
     text: string;
+    displayHtml?: string;
+    displayText?: string;
     raw: string;
     hidden: boolean;
 

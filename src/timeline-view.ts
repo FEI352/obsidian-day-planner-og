@@ -1,4 +1,4 @@
-import { ItemView, type WorkspaceLeaf } from "obsidian";
+import { ItemView, Keymap, type WorkspaceLeaf } from "obsidian";
 import { mount, unmount } from "svelte";
 import { VIEW_TYPE_TIMELINE } from "./constants";
 import type { PlanSummaryData } from "./plan-data";
@@ -82,6 +82,36 @@ export default class TimelineView extends ItemView {
                 zoomLevel: settings.timelineZoomLevel || 4,
                 rootEl: this.contentEl,
                 settings: settings,
+                onInternalLinkClick: (
+                    href: string,
+                    sourcePath: string,
+                    event: MouseEvent,
+                ) => {
+                    const newLeaf =
+                        event.type === "auxclick"
+                            ? "tab"
+                            : Keymap.isModEvent(event);
+                    void this.app.workspace.openLinkText(
+                        href,
+                        sourcePath,
+                        newLeaf,
+                    );
+                },
+                onInternalLinkHover: (
+                    href: string,
+                    sourcePath: string,
+                    targetEl: HTMLElement,
+                    event: MouseEvent,
+                ) => {
+                    this.app.workspace.trigger("hover-link", {
+                        event,
+                        source: VIEW_TYPE_TIMELINE,
+                        hoverParent: this,
+                        targetEl,
+                        linktext: href,
+                        sourcePath,
+                    });
+                },
             },
         });
         this.onOpenCallback();

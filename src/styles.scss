@@ -806,6 +806,54 @@
     padding: 1px 2px;
     border-radius: 2px;
   }
+
+  code {
+    background-color: rgba(255, 255, 255, 0.16);
+    color: var(--timeline-text-color);
+    padding: 1px 4px;
+    border-radius: 3px;
+    font-size: 0.9em;
+  }
+
+  .ei_Copy a.internal-link,
+  .ei_Copy a.external-link {
+    color: var(--timeline-text-color);
+    text-decoration: underline;
+    text-decoration-color: color-mix(in srgb, var(--timeline-text-color) 55%, transparent);
+    text-underline-offset: 2px;
+    border-radius: 3px;
+    padding: 0 3px;
+    background-color: rgba(255, 255, 255, 0.12);
+    transition: background-color 0.15s ease, text-decoration-color 0.15s ease;
+    cursor: pointer;
+  }
+
+  .ei_Copy a.internal-link:hover,
+  .ei_Copy a.external-link:hover {
+    color: var(--timeline-text-color);
+    background-color: rgba(255, 255, 255, 0.26);
+    text-decoration-color: var(--timeline-text-color);
+  }
+
+  .ei_Copy a.day-planner-embed-link {
+    background-color: rgba(255, 255, 255, 0.16);
+    border-left: 2px solid color-mix(in srgb, var(--timeline-text-color) 70%, transparent);
+    padding-left: 5px;
+  }
+
+  .ei_Copy a.day-planner-embed-badge {
+    display: inline-block;
+    font-size: 0.8em;
+    line-height: 1.2;
+    padding: 0 4px;
+    text-decoration: none;
+    background-color: rgba(255, 255, 255, 0.18);
+  }
+
+  .ei_Copy a.is-unresolved {
+    opacity: 0.82;
+    text-decoration-style: dashed;
+  }
 }
 
 .day-planner-timeline-color-preview-container {

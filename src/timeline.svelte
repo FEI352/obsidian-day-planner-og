@@ -1,5 +1,6 @@
 <script lang="ts">
 import { onDestroy, onMount } from "svelte";
+import { renderTaskHtmlFallback } from "./link-resolver";
 import Logger from "./logger";
 import { moment } from "obsidian";
 import { momentFn } from "./moment";
@@ -7,15 +8,20 @@ import type { PlanItem } from "./plan-data";
 import type { DayPlannerSettings } from "./settings";
 import { now, planSummary, timelineColorSchemes } from "./timeline-store";
 
-const MARKDOWN_LINK_REGEX = /\[([^\]]+)\]\(([^)]+)\)/g;
-const WIKI_LINK_REGEX = /\[\[([^\]|]+)(\|([^\]]+))?\]\]/g;
-const BOLD_REGEX = /__(\S(?:.*\S)?)__|\*\*(\S(?:.*\S)?)\*\*/g;
-const ITALIC_REGEX = /_(\S(?:.*\S)?)_|\*(\S(?:.*\S)?)\*/g;
-const HIGHLIGHT_REGEX = /==(\S(?:.*\S)?)==/g;
-
 export let zoomLevel: number;
 export let rootEl: HTMLElement;
 export let settings: DayPlannerSettings;
+export let onInternalLinkClick:
+    | ((href: string, sourcePath: string, event: MouseEvent) => void)
+    | undefined = undefined;
+export let onInternalLinkHover:
+    | ((
+          href: string,
+          sourcePath: string,
+          targetEl: HTMLElement,
+          event: MouseEvent,
+      ) => void)
+    | undefined = undefined;
 
 Logger.getInstance().logDebug("TimelineView.onOpen", { zoomLevel, rootEl });
 
@@ -45,14 +51,79 @@ function positionFromTime(time: Date) {
 
 onMount(() => {
     addScrollListener();
+    addLinkListeners();
 });
 
 onDestroy(() => {
     removeScrollListener();
+    removeLinkListeners();
     if (scrollResumeTimer) {
         clearTimeout(scrollResumeTimer);
     }
 });
+
+function findClosestLink(target: EventTarget | null): HTMLAnchorElement | null {
+    if (!(target instanceof Element)) {
+        return null;
+    }
+    const anchor = target.closest("a");
+    return anchor instanceof HTMLAnchorElement ? anchor : null;
+}
+
+function handleLinkActivate(event: MouseEvent) {
+    if (event.type === "auxclick" && event.button !== 1) {
+        return;
+    }
+    const linkEl = findClosestLink(event.target);
+    if (!linkEl) {
+        return;
+    }
+    if (linkEl.classList.contains("internal-link")) {
+        event.preventDefault();
+        event.stopPropagation();
+        const href =
+            linkEl.getAttribute("data-href") || linkEl.getAttribute("href");
+        if (href && onInternalLinkClick) {
+            const sourcePath =
+                linkEl.getAttribute("data-source-path") ||
+                $planSummary.sourcePath ||
+                "";
+            onInternalLinkClick(href, sourcePath, event);
+        }
+        return;
+    }
+    if (linkEl.classList.contains("external-link")) {
+        event.stopPropagation();
+    }
+}
+
+function handleLinkHover(event: MouseEvent) {
+    const linkEl = findClosestLink(event.target);
+    if (!linkEl || !linkEl.classList.contains("internal-link")) {
+        return;
+    }
+    const href =
+        linkEl.getAttribute("data-href") || linkEl.getAttribute("href");
+    if (href && onInternalLinkHover) {
+        const sourcePath =
+            linkEl.getAttribute("data-source-path") ||
+            $planSummary.sourcePath ||
+            "";
+        onInternalLinkHover(href, sourcePath, linkEl, event);
+    }
+}
+
+function addLinkListeners() {
+    rootEl.addEventListener("click", handleLinkActivate);
+    rootEl.addEventListener("auxclick", handleLinkActivate);
+    rootEl.addEventListener("mouseover", handleLinkHover);
+}
+
+function removeLinkListeners() {
+    rootEl.removeEventListener("click", handleLinkActivate);
+    rootEl.removeEventListener("auxclick", handleLinkActivate);
+    rootEl.removeEventListener("mouseover", handleLinkHover);
+}
 
 function itemClasses(item: PlanItem) {
     const classes = [];
@@ -68,21 +139,11 @@ function itemClasses(item: PlanItem) {
     return classes.join(" ");
 }
 
-function itemText(item: PlanItem): string {
-    let text = item.text ?? "";
-    // Convert Markdown links to HTML
-    text = text.replace(MARKDOWN_LINK_REGEX, (_match, p1, _p2) => {
-            return p1;
-        })
-        // Convert Wiki links to HTML
-        .replace(WIKI_LINK_REGEX, (_match, p1, _p2, p3) => {
-            const alias = p3 || p1;
-            return alias;
-        })
-        .replace(BOLD_REGEX, (_match, p1, p2) => `<strong>${p1 || p2}</strong>`)
-        .replace(ITALIC_REGEX, (_match, p1, p2) => `<em>${p1 || p2}</em>`)
-        .replace(HIGHLIGHT_REGEX, `<mark>$1</mark>`);
-    return text;
+function itemText(item: PlanItem, sourcePath: string): string {
+    if (item.displayHtml !== undefined) {
+        return item.displayHtml;
+    }
+    return renderTaskHtmlFallback(item.text ?? "", sourcePath);
 }
 
 function addScrollListener() {
@@ -148,7 +209,7 @@ function disableAutoScroll() {
                         ></div>
                         <div class="ei_Item">
                             <span class="ei_Title">{item.rawTime}</span>
-                            <span class="ei_Copy">{@html itemText(item)}</span>
+                            <span class="ei_Copy">{@html itemText(item, $planSummary.sourcePath)}</span>
                         </div>
                     </div>
                 </div>
